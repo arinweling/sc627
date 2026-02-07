@@ -1,0 +1,27 @@
+# GVD Planner Configuration
+gvd_planner:
+  ros__parameters:
+    # Start position is now dynamically obtained from robot's TF pose
+    
+    # GVD/Brushfire parameters
+    skeleton_threshold: 2.0     # Minimum distance from obstacles for skeleton points
+    skeleton_cost_multiplier: 0.000000001  # Cost multiplier for skeleton points (lower = stronger preference)
+    
+    # Path planning parameters
+    diagonal_cost: 1.414  # Cost for diagonal moves
+    straight_cost: 1.0    # Cost for straight moves
+    search_radius: 50     # Search radius for nearest skeleton point
+    waypoint_spacing: 0.1  # Minimum distance between waypoints in meters (higher = fewer waypoints)
+
+    # Map
+    map_yaml: my_gauntlet_map.yaml
+    
+    # Visualization
+    path_line_width: 0.15
+    path_color_r: 0.0
+    path_color_g: 1.0
+    path_color_b: 0.0
+    skeleton_point_size: 0.03
+    skeleton_color_r: 0.0
+    skeleton_color_g: 1.0
+    skeleton_color_b: 1.0

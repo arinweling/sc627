@@ -1,0 +1,36 @@
+# Combined Planner Server Configuration
+planner_server:
+  ros__parameters:
+    # Planner selection: 'astar', 'gvd', or 'both'
+    planner_type: both
+    
+    # Start position is now dynamically obtained from robot's TF pose
+    
+    # Common path planning parameters
+    diagonal_cost: 1.414  # Cost for diagonal moves
+    straight_cost: 1.0    # Cost for straight moves
+    robot_radius: 0.12    # Robot radius in meters (TurtleBot3 ~0.09m + safety margin)
+    waypoint_spacing: 0.1  # Minimum distance between waypoints in meters (higher = fewer waypoints)
+    
+    # Map
+    map_yaml: my_gauntlet_map.yaml
+    
+    # A* Planner visualization
+    astar_path_line_width: 0.15
+    astar_path_color_r: 1.0
+    astar_path_color_g: 0.0
+    astar_path_color_b: 0.0
+    
+    # GVD Planner parameters
+    skeleton_threshold: 2.0     # Minimum distance from obstacles for skeleton points
+    search_radius: 50           # Search radius for nearest skeleton point
+    
+    # GVD Planner visualization
+    gvd_path_line_width: 0.15
+    gvd_path_color_r: 0.0
+    gvd_path_color_g: 1.0
+    gvd_path_color_b: 0.0
+    skeleton_point_size: 0.03
+    skeleton_color_r: 0.0
+    skeleton_color_g: 1.0
+    skeleton_color_b: 1.0

@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="gauntlet">
+    <physics type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include>
+
+    <model name="outer_walls">
+      <static>true</static>
+      <link name="link">
+        <visual name="v_top"><pose>0 1.5 0.15 0 0 0</pose><geometry><box><size>3.0 0.05 0.3</size></box></geometry></visual>
+        <collision name="c_top"><pose>0 1.5 0.15 0 0 0</pose><geometry><box><size>3.0 0.05 0.3</size></box></geometry></collision>
+        <visual name="v_bottom"><pose>0 -1.5 0.15 0 0 0</pose><geometry><box><size>3.0 0.05 0.3</size></box></geometry></visual>
+        <collision name="c_bottom"><pose>0 -1.5 0.15 0 0 0</pose><geometry><box><size>3.0 0.05 0.3</size></box></geometry></collision>
+        <visual name="v_left"><pose>-1.5 0 0.15 0 0 0</pose><geometry><box><size>0.05 3.0 0.3</size></box></geometry></visual>
+        <collision name="c_left"><pose>-1.5 0 0.15 0 0 0</pose><geometry><box><size>0.05 3.0 0.3</size></box></geometry></collision>
+        <visual name="v_right"><pose>1.5 0 0.15 0 0 0</pose><geometry><box><size>0.05 3.0 0.3</size></box></geometry></visual>
+        <collision name="c_right"><pose>1.5 0 0.15 0 0 0</pose><geometry><box><size>0.05 3.0 0.3</size></box></geometry></collision>
+      </link>
+    </model>
+
+    <model name="complex_l_structure">
+      <static>true</static>
+      <link name="link">
+        <visual name="v_main"><pose>0.0 -0.7 0.15 0 0 0</pose><geometry><box><size>0.07 1.6 0.3</size></box></geometry><material><ambient>0.2 0.6 0.2 1</ambient><diffuse>0.3 0.7 0.3 1</diffuse></material></visual>
+        <collision name="c_main"><pose>0.0 -0.7 0.15 0 0 0</pose><geometry><box><size>0.07 1.6 0.3</size></box></geometry></collision>
+        <visual name="v_arm"><pose>0.48 0.1 0.15 0 0 0</pose><geometry><box><size>0.9 0.07 0.3</size></box></geometry><material><ambient>0.2 0.6 0.2 1</ambient><diffuse>0.3 0.7 0.3 1</diffuse></material></visual>
+        <collision name="c_arm"><pose>0.48 0.1 0.15 0 0 0</pose><geometry><box><size>0.9 0.07 0.3</size></box></geometry></collision>
+        <visual name="v_cap"><pose>0.9 -0.05 0.15 0 0 0</pose><geometry><box><size>0.07 0.3 0.3</size></box></geometry><material><ambient>0.2 0.6 0.2 1</ambient><diffuse>0.3 0.7 0.3 1</diffuse></material></visual>
+        <collision name="c_cap"><pose>0.9 -0.05 0.15 0 0 0</pose><geometry><box><size>0.07 0.3 0.3</size></box></geometry></collision>
+      </link>
+    </model>
+
+    <model name="side_block">
+      <static>true</static>
+      <pose>-1.235 0.0 0.15 0 0 0</pose> 
+      <link name="link">
+        <visual name="visual"><geometry><box><size>0.53 0.6 0.3</size></box></geometry><material><ambient>0.2 0.2 0.8 1</ambient><diffuse>0.3 0.3 0.9 1</diffuse></material></visual>
+        <collision name="collision"><geometry><box><size>0.53 0.6 0.3</size></box></geometry></collision>
+      </link>
+    </model>
+
+    <model name="top_blocks">
+      <static>true</static>
+      <link name="link">
+        <visual name="v_b1"><pose>-0.5 1.1 0.15 0 0 0</pose><geometry><box><size>0.7 0.1 0.3</size></box></geometry><material><ambient>0.8 0.2 0.2 1</ambient><diffuse>0.9 0.3 0.3 1</diffuse></material></visual>
+        <collision name="c_b1"><pose>-0.5 1.1 0.15 0 0 0</pose><geometry><box><size>0.7 0.1 0.3</size></box></geometry></collision>
+        <visual name="v_b2"><pose>0.5 1.1 0.15 0 0 0</pose><geometry><box><size>0.7 0.1 0.3</size></box></geometry><material><ambient>0.8 0.2 0.2 1</ambient><diffuse>0.9 0.3 0.3 1</diffuse></material></visual>
+        <collision name="c_b2"><pose>0.5 1.1 0.15 0 0 0</pose><geometry><box><size>0.7 0.1 0.3</size></box></geometry></collision>
+      </link>
+    </model>
+
+    <!-- TurtleBot3 Burger -->
+    <include>
+      <uri>model://turtlebot3_burger</uri>
+      <pose>-1.1 -0.8 0.01 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

@@ -1,7 +1,14 @@
 # Assignment 1 Week 2 - Path Planning with A* and GVD
+## Demo videos present at 
+https://drive.google.com/drive/folders/1IKHoOeiIJZ6rUMLL74V-qUrAEhWeYKcm?usp=drive_link
+
 
 ROS 2 path planning implementation featuring A* and Generalized Voronoi Diagram (GVD) planners with autonomous path following for TurtleBot3 in Gazebo simulation.
-
+## Work Distribution
+1. Arin Weling (22b1230) : Integrating path planner with Gazebo and Rviz2 for testing and visualization
+2. Saumya Shah (22b1238) : Implemented the Astar algorithm
+3. Ayush Prasad (22b0674) : Implemented the GVD algorithm
+4. Rishabh Parwal (24b1212) : Tuned PID loops and developed the path planner code
 ## Overview
 
 This package provides:

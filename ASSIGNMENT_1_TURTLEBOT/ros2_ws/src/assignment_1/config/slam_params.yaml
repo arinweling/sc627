@@ -1,0 +1,29 @@
+mhd_slam:
+  ros__parameters:
+    # Map configuration
+    map_resolution: 0.025        # meters per pixel (2.5cm)
+    map_width: 400           # grid cells (10m x 10m map)
+    map_height: 400            # grid cells
+    
+    # Scan matching parameters
+    k_best_matches: 100         # Number of best matches for MHD calculation (increased for stability)
+    scan_min_range: 0.12        # Minimum valid scan range (m)
+    scan_max_range: 3.5         # Maximum valid scan range (m)
+    min_movement_update: 0.03   # Minimum movement before updating map (meters) - REDUCED for smoother updates
+    min_rotation_update: 0.2   # Minimum rotation before updating map (radians ~9 degrees) - INCREASED to skip jerky turns
+    
+    # EKF parameters (process noise - trust odometry less during turns)
+    process_noise: [0.005, 0.005, 0.05]  # [x, y, theta] variance - INCREASED theta noise for jerky turns
+    
+    # EKF parameters (measurement noise from scan matching - trust more during straight movement)
+    measurement_noise: [0.06, 0.06, 0.25]  # [x, y, theta] variance - INCREASED theta to smooth rotations
+    
+    # Occupancy grid parameters
+    occupancy_threshold: 0.1    # Threshold for occupied cells
+    
+    # Publishing rate
+    publish_rate: 2.0           # Hz (map publishing frequency)
+    tf_publish_rate: 20.0       # Hz (TF broadcasting frequency - high to prevent disappearing)
+    
+    # Use simulation time
+    use_sim_time: false         # Changed to false for real robot

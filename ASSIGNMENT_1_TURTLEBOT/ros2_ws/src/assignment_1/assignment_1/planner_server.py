@@ -25,7 +25,6 @@ class PlannerServer(Node):
         self.declare_parameter('planner_type', 'both')  # 'astar', 'gvd', or 'both'
         self.declare_parameter('diagonal_cost', 1.414)
         self.declare_parameter('straight_cost', 1.0)
-        self.declare_parameter('map_yaml', 'my_gauntlet_map.yaml')
         self.declare_parameter('robot_radius', 0.12)
         self.declare_parameter('waypoint_spacing', 0.2)
         
@@ -51,7 +50,6 @@ class PlannerServer(Node):
         self.planner_type = self.get_parameter('planner_type').value
         self.diagonal_cost = self.get_parameter('diagonal_cost').value
         self.straight_cost = self.get_parameter('straight_cost').value
-        self.map_yaml = self.get_parameter('map_yaml').value
         self.robot_radius = self.get_parameter('robot_radius').value
         self.waypoint_spacing = self.get_parameter('waypoint_spacing').value
         
@@ -74,8 +72,6 @@ class PlannerServer(Node):
         self.skeleton_color_b = self.get_parameter('skeleton_color_b').value
         
         # Publishers
-        self.map_pub = self.create_publisher(OccupancyGrid, '/map', 10)
-        
         if self.planner_type in ['astar', 'both']:
             self.astar_path_pub = self.create_publisher(Path, '/planned_path', 10)
             self.astar_marker_pub = self.create_publisher(Marker, '/path_marker', 10)
@@ -86,6 +82,8 @@ class PlannerServer(Node):
             self.skeleton_pub = self.create_publisher(Marker, '/gvd_skeleton', 10)
         
         # Subscribers
+        self.map_sub = self.create_subscription(
+            OccupancyGrid, '/map', self.map_callback, 10)
         self.goal_sub = self.create_subscription(
             PoseStamped, '/goal_pose', self.goal_callback, 10)
         
@@ -93,67 +91,57 @@ class PlannerServer(Node):
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
         
-        # Load map
-        self.load_map()
-        
-        # Compute GVD if needed
-        if self.planner_type in ['gvd', 'both']:
-            self.compute_gvd()
-            self.timer = self.create_timer(1.0, self.publish_skeleton)
+        # Map data - will be populated from /map topic
+        self.map_received = False
+        self.binary_map = None
+        self.map_data = None
+        self.skeleton = None
+        self.distance_map = None
         
         # Goal will be set dynamically
         self.goal = None
         
-        # Publish map periodically
-        self.map_timer = self.create_timer(1.0, self.publish_map)
+        self.get_logger().info(f'Planner Server initialized - waiting for map from /map topic')
         
-        self.get_logger().info(f'Planner Server initialized with {self.planner_type} planner(s)')
+        # Publish skeleton periodically if GVD is enabled
+        if self.planner_type in ['gvd', 'both']:
+            self.timer = self.create_timer(1.0, self.publish_skeleton)
         
-    def load_map(self):
-        """Load the map from yaml and pgm files"""
-        pkg_path = get_package_share_directory('assignment_1')
-        map_yaml_path = os.path.join(pkg_path, 'maps', self.map_yaml)
+    def map_callback(self, msg):
+        """Receive map from /map topic"""
+        if self.map_received:
+            return  # Only process map once
         
-        # Load YAML
-        with open(map_yaml_path, 'r') as f:
-            map_config = yaml.safe_load(f)
+        self.get_logger().info('Received map from /map topic')
         
-        # Load image
-        map_image_path = os.path.join(pkg_path, 'maps', map_config['image'])
-        img = Image.open(map_image_path)
-        img_array = np.array(img)
+        # Extract map metadata
+        self.width = msg.info.width
+        self.height = msg.info.height
+        self.resolution = msg.info.resolution
+        self.origin = [msg.info.origin.position.x, msg.info.origin.position.y, 0.0]
         
-        # Convert to occupancy grid (0 = free, 100 = occupied)
-        self.map_data = np.zeros_like(img_array, dtype=np.int8)
-        self.map_data[img_array < 250] = 100  # Occupied
-        self.map_data[img_array >= 250] = 0   # Free
+        # Convert OccupancyGrid data to numpy array
+        map_data_array = np.array(msg.data, dtype=np.int8).reshape((self.height, self.width))
         
-        # Binary map for GVD (0 = occupied, 1 = free)
-        self.binary_map = np.zeros_like(img_array, dtype=np.uint8)
-        self.binary_map[img_array >= 250] = 1
+        # Store as map_data (0 = free, 100 = occupied, -1 = unknown)
+        self.map_data = map_data_array
         
-        self.resolution = map_config['resolution']
-        self.origin = map_config['origin']
-        self.height, self.width = self.map_data.shape
+        # Convert to binary map for GVD (0 = occupied, 1 = free)
+        # OccupancyGrid: -1 = unknown, 0 = free, 100 = occupied
+        self.binary_map = np.zeros((self.height, self.width), dtype=np.uint8)
+        self.binary_map[map_data_array == 0] = 1  # Free space
+        self.binary_map[map_data_array == -1] = 0  # Treat unknown as occupied for safety
+        # map_data == 100 stays 0 (occupied)
         
-        self.get_logger().info(f'Map loaded: {self.width}x{self.height}, resolution: {self.resolution}')
+        self.get_logger().info(f'Map received: {self.width}x{self.height}, resolution: {self.resolution}')
+        self.get_logger().info(f'Origin: [{self.origin[0]:.2f}, {self.origin[1]:.2f}]')
         
-    def publish_map(self):
-        """Publish the occupancy grid map"""
-        grid = OccupancyGrid()
-        grid.header.stamp = self.get_clock().now().to_msg()
-        grid.header.frame_id = 'map'
-        grid.info.resolution = float(self.resolution)
-        grid.info.width = int(self.width)
-        grid.info.height = int(self.height)
-        grid.info.origin.position.x = float(self.origin[0])
-        grid.info.origin.position.y = float(self.origin[1])
-        grid.info.origin.position.z = 0.0
-        yaw = float(self.origin[2]) if len(self.origin) > 2 else 0.0
-        grid.info.origin.orientation.z = np.sin(yaw / 2.0)
-        grid.info.origin.orientation.w = np.cos(yaw / 2.0)
-        grid.data = self.map_data.flatten().tolist()
-        self.map_pub.publish(grid)
+        # Compute GVD if needed
+        if self.planner_type in ['gvd', 'both']:
+            self.compute_gvd()
+        
+        self.map_received = True
+        self.get_logger().info(f'Planner Server ready with {self.planner_type} planner(s)')
         
     def compute_gvd(self):
         """Compute Generalized Voronoi Diagram using distance transform and skeletonization"""
@@ -169,7 +157,7 @@ class PlannerServer(Node):
         
     def publish_skeleton(self):
         """Publish skeleton as point markers"""
-        if not hasattr(self, 'skeleton'):
+        if not self.map_received or self.skeleton is None:
             return
             
         marker = Marker()
@@ -224,6 +212,10 @@ class PlannerServer(Node):
     
     def goal_callback(self, msg):
         """Set goal position and plan paths"""
+        if not self.map_received:
+            self.get_logger().warn('Cannot plan path - map not received yet')
+            return
+        
         x, y = msg.pose.position.x, msg.pose.position.y
         self.goal = self.world_to_grid(x, y)
         self.get_logger().info(f'Goal set to: ({x:.2f}, {y:.2f}) -> grid ({self.goal[0]}, {self.goal[1]})')

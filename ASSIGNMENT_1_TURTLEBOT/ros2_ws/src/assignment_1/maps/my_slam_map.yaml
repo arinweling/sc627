@@ -1,0 +1,7 @@
+image: my_slam_map.pgm
+mode: trinary
+resolution: 0.025
+origin: [-5.5, -5.51, 0.0]
+negate: 0
+occupied_thresh: 0.9
+free_thresh: 0.10

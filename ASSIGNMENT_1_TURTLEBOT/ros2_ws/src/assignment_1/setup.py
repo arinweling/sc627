@@ -33,6 +33,8 @@ setup(
             'gvd_planner = assignment_1.gvd_planner:main',
             'path_follower = assignment_1.path_follower:main',
             'planner_server = assignment_1.planner_server:main',
+            'mhd_slam = assignment_1.mhd_slam:main',
+            'map_corrector = assignment_1.map_corrector:main',
         ],
     },
 )

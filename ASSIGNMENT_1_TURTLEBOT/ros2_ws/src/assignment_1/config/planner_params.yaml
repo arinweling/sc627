@@ -9,11 +9,8 @@ planner_server:
     # Common path planning parameters
     diagonal_cost: 1.414  # Cost for diagonal moves
     straight_cost: 1.0    # Cost for straight moves
-    robot_radius: 0.12    # Robot radius in meters (TurtleBot3 ~0.09m + safety margin)
+    robot_radius: 0.15    # Robot radius in meters (TurtleBot3 ~0.09m + safety margin)
     waypoint_spacing: 0.1  # Minimum distance between waypoints in meters (higher = fewer waypoints)
-    
-    # Map
-    map_yaml: my_gauntlet_map.yaml
     
     # A* Planner visualization
     astar_path_line_width: 0.15

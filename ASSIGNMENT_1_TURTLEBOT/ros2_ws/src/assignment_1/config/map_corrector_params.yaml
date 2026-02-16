@@ -1,0 +1,16 @@
+map_corrector:
+  ros__parameters:
+    # Path to the map YAML file (will be set by launch file)
+    map_yaml_file: ''
+    
+    # Rotation angle in degrees: 0, 90, 180, or 270
+    rotation_angle: 0.0
+    
+    # Flip the map horizontally (left-right)
+    flip_horizontal: false
+    
+    # Flip the map vertically (up-down)
+    flip_vertical: false
+    
+    # Output topic (publish corrected map)
+    output_topic: '/map'

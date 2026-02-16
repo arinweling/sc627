@@ -1,7 +1,7 @@
 path_follower:
   ros__parameters:
-    linear_speed: 0.5       # Max linear velocity (m/s)
+    linear_speed: 0.22       # Max linear velocity (m/s)
     angular_speed: 0.5       # Max angular velocity (rad/s)
-    k_p: 0.8                 # Proportional gain for linear velocity control
+    k_p: 0.6                 # Proportional gain for linear velocity control
     goal_tolerance: 0.1      # Distance to waypoint to consider it reached (m)
-    path_topic: /planned_path  # Topic to subscribe for path (use /planned_path for A* planner)
+    path_topic: /planned_path  # Topic to subscribe for path (use /planned_path for A* planner or /gvd_path for GVD planner)

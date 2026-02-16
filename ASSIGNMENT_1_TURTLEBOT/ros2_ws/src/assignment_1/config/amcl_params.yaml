@@ -1,0 +1,89 @@
+amcl:
+  ros__parameters:
+    use_sim_time: true
+    
+    # Robot settings
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"
+    base_frame_id: "base_footprint"
+    odom_frame_id: "odom"
+    global_frame_id: "map"
+    
+    # AMCL filter settings
+    min_particles: 5000
+    max_particles: 15000
+    
+    # Update thresholds - make AMCL update more frequently for better tracking
+    update_min_d: 0.02  # Update every 2cm for faster response
+    update_min_a: 0.05  # Update every ~2.9 degrees
+    
+    # Resampling settings
+    resample_interval: 2  # Resample less often to maintain diversity
+    
+    # Recovery detection - triggers when particles spread too much
+    recovery_alpha_slow: 0.001  # Slow average decay rate
+    recovery_alpha_fast: 0.1    # Fast average decay rate
+    # When fast_avg < slow_avg, AMCL knows particles are diverging and adds random particles
+    
+    # Particle filter KLD resampling (triggers when uncertainty is high)
+    pf_err: 0.05  # Maximum particle filter error (lower = more particles when uncertain)
+    pf_z: 0.99    # Upper standard normal quantile for KLD sampling
+    
+    # Spatial resolution for KLD sampling (detects particle spread)
+    spatial_resolution_x: 0.5  # Bin size in X (meters)
+    spatial_resolution_y: 0.5  # Bin size in Y (meters)  
+    spatial_resolution_theta: 0.1  # Bin size in theta (radians ~5.7°)
+    
+    # Random particles to help recovery
+    random_pose_count: 500  # Inject many random particles when recovering
+    
+    # Transform settings
+    transform_tolerance: 1.0
+    tf_broadcast: true
+    
+    # Initial pose
+    set_initial_pose: true
+    initial_pose:
+      x: -1.1
+      y: -0.8
+      z: 0.0
+      yaw: 0.0
+    
+    # Laser model parameters
+    laser_max_range: 3.5
+    laser_min_range: 0.12
+    laser_max_beams: 500  # Increased from 60 for better localization
+    
+    # Likelihood field model
+    laser_model_type: "likelihood_field"
+    laser_likelihood_max_dist: 0.05  # Increased tolerance for matching
+    laser_z_hit: 0.8    # Reduce trust in laser to allow more flexibility
+    laser_z_rand: 0.2   # Increase random component for recovery
+    
+    # Odometry model parameters (differential drive)
+    odom_model_type: "diff-corrected"
+    
+    # Odometry noise parameters (lower = trust odometry more, higher = trust laser more)
+    alpha1: 0.1  # Increased to spread particles more
+    alpha2: 0.1  # Increased to spread particles more
+    alpha3: 0.1  # Increased to spread particles more
+    alpha4: 0.1  # Increased to spread particles more
+    alpha5: 0.1  # Strafe noise (for omni-directional robots)
+    
+    # Scan settings
+    do_beamskip: false
+    beam_skip_distance: 0.5
+    beam_skip_threshold: 0.3
+    beam_skip_error_threshold: 0.9
+    
+    # Save pose
+    save_pose_rate: 0.5
+    
+    # Always on
+    always_reset_initial_pose: false
+
+map_server:
+  ros__parameters:
+    use_sim_time: true
+    yaml_filename: "arms_lab_map_good.yaml"
+    topic_name: "map"
+    frame_id: "map"
